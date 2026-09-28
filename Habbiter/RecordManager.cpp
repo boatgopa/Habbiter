@@ -1,4 +1,9 @@
 #include "RecordManager.h"
+//날짜 비교용
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 
 using namespace std;
 
@@ -26,25 +31,85 @@ void RecordManager::AllCompleted(DailyRecord& record)
 	record.allCompleted = true;
 }
 
-//TODO : 아직 날짜가 한군데 빠져있어도 연속으로 True라서 연속 달성으로 COunt가 올라감. 나중에 이를 해결
-int RecordManager::Count(const string& date)
+int RecordManager::Count(const std::string& date)
 {
-	FileManager fileManager;
+    FileManager fileManager;
 
-	vector<DailyRecord> records = fileManager.LoadAllRecords();
+    std::vector<DailyRecord> records =
+        fileManager.LoadAllRecords();
 
-	int count = 0;
+    std::string currentDate = date;
 
-	for (int i = static_cast<int>(records.size()) - 1; i >= 0; --i)
-	{
-		//미달성시
-		if (!records[i].allCompleted)
-		{
-			break;
-		}
+    int count = 0;
 
-		count++;
-	}
+    while (true)
+    {
+        bool found = false;
 
-	return count;
+        for (const auto& record : records)
+        {
+            if (record.date == currentDate)
+            {
+                found = true;
+
+                if (!record.allCompleted)
+                {
+                    return count;
+                }
+
+                count++;
+                break;
+            }
+        }
+
+        // 해당 날짜의 기록이 없으면 연속이 끊김
+        if (!found)
+        {
+            break;
+        }
+
+        // 하루 전 날짜로 이동
+        currentDate = GetYesterday(currentDate);
+
+        if (currentDate.empty())
+        {
+            break;
+        }
+    }
+
+    return count;
+}
+
+//어제거랑 오늘 날짜 비교
+std::string RecordManager::GetYesterday(const std::string& date)
+{
+    std::tm time{};
+
+    std::istringstream stream(date);
+
+    stream >> std::get_time(&time, "%Y-%m-%d");
+
+    if (stream.fail())
+    {
+        return "";
+    }
+
+    time.tm_hour = 12;
+
+    std::time_t timeValue = std::mktime(&time);
+
+    timeValue -= 24 * 60 * 60;
+
+    std::tm previousTime{};
+
+    localtime_s(&previousTime, &timeValue);
+
+    std::ostringstream result;
+
+    result << std::put_time(
+        &previousTime,
+        "%Y-%m-%d"
+    );
+
+    return result.str();
 }

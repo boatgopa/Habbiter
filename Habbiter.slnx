@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="Habbiter/Habbiter.vcxproj" />
+  <Project Path="Habbiter/Habbiter.vcxproj" Id="484f8e51-ce31-4235-8b4c-e4e2a9f378af" />
 </Solution>

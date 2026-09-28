@@ -2,18 +2,18 @@
 
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 using namespace std;
 
 //습관 저장
-void FileManager::SaveHabits(const vector<Habit>& habits)
+bool FileManager::SaveHabits(const vector<Habit>& habits)
 {
 	ofstream file("habits.csv");
 
 	if (!file.is_open())
 	{
-		return;
-		// TODO : 파일 열기 실패 처리 로직 추가, 아마도 파일 생성할 듯
+		return false;
 	}
 
 	file << "name,date\n";
@@ -24,6 +24,8 @@ void FileManager::SaveHabits(const vector<Habit>& habits)
 	}
 
 	file.close();
+
+	return true;
 }
 
 //습관 파일 불러오기
@@ -57,36 +59,114 @@ vector<Habit> FileManager::LoadHabits()
 }
 
 //기록 저장하기
-void FileManager::SaveRecord(const DailyRecord& record)
+bool FileManager::SaveRecord(const DailyRecord& record)
 {
-	ofstream file("Records.csv", ios::app); // 파일 뒤에서부터 이어서 저장.
-	if (!file.is_open())
+	ifstream inputFile("Records.csv");
+
+	vector<DailyRecord> records;
+
+	if (inputFile.is_open())
 	{
-		return;
-		// TODO : 파일 열기 실패 처리 로직 추가, 아마도 파일 생성할 듯
-	}
+		string line;
 
-	file << record.date << ",";
-	file << (record.allCompleted ? "true" : "false") << ",";
+		// 헤더 건너뛰기
+		getline(inputFile, line);
 
-	bool first = true;
-
-	for (const auto& habit : record.habits)
-	{
-		if (!first)
+		while (getline(inputFile, line))
 		{
-			file << "|";
+			stringstream ss(line);
+
+			string recordDate;
+			string allCompleted;
+			string habits;
+
+			getline(ss, recordDate, ',');
+			getline(ss, allCompleted, ',');
+			getline(ss, habits);
+
+			DailyRecord loadedRecord;
+
+			loadedRecord.date = recordDate;
+			loadedRecord.allCompleted =
+				(allCompleted == "true");
+
+			stringstream habitStream(habits);
+			string habitData;
+
+			while (getline(habitStream, habitData, '|'))
+			{
+				stringstream habitPair(habitData);
+
+				string habitName;
+				string completed;
+
+				getline(habitPair, habitName, '=');
+				getline(habitPair, completed);
+
+				loadedRecord.habits[habitName] =
+					(completed == "true");
+			}
+
+			records.push_back(loadedRecord);
 		}
 
-		file << habit.first << "=";
-		file << (habit.second ? "true" : "false");
-		
-		first = false;
+		inputFile.close();
 	}
 
-	file << "\n";
+	// 같은 날짜의 기록 찾기
+	bool found = false;
+
+	for (auto& savedRecord : records)
+	{
+		if (savedRecord.date == record.date)
+		{
+			savedRecord = record;
+			found = true;
+			break;
+		}
+	}
+
+	// 같은 날짜가 없으면 새 기록 추가
+	if (!found)
+	{
+		records.push_back(record);
+	}
+
+	ofstream file("Records.csv");
+
+	if (!file.is_open())
+	{
+		return false;
+	}
+
+	file << "date,allCompleted,habits\n";
+
+	for (const auto& savedRecord : records)
+	{
+		file << savedRecord.date << ",";
+		file << (savedRecord.allCompleted ? "true" : "false") << ",";
+
+		bool first = true;
+
+		for (const auto& habit : savedRecord.habits)
+		{
+			if (!first)
+			{
+				file << "|";
+			}
+
+			file << habit.first << "=";
+			file << (habit.second ? "true" : "false");
+
+			first = false;
+		}
+
+		file << "\n";
+	}
 
 	file.close();
+
+	return true;
 }
 
 //기록 불러오기
@@ -204,4 +284,60 @@ vector<DailyRecord> FileManager::LoadAllRecords()
 
 	file.close();
 	return records;
+}
+
+DailyRecord FileManager::CreateTodayRecord(
+	const std::string& date,
+	const std::vector<Habit>& habits)
+{
+	DailyRecord record;
+
+	record.date = date;
+	record.allCompleted = false;
+
+	for (const auto& habit : habits)
+	{
+		if (habit.date <= date)
+		{
+			record.habits[habit.name] = false;
+		}
+	}
+
+	SaveRecord(record);
+
+	return record;
+}
+
+bool FileManager::HasRecord(const std::string& date)
+{
+	ifstream file("Records.csv");
+
+	if (!file.is_open())
+	{
+		return false;
+	}
+
+	string line;
+
+	// 헤더 건너뛰기
+	getline(file, line);
+
+	while (getline(file, line))
+	{
+		stringstream ss(line);
+
+		string recordDate;
+
+		getline(ss, recordDate, ',');
+
+		if (recordDate == date)
+		{
+			file.close();
+			return true;
+		}
+	}
+
+	file.close();
+
+	return false;
 }

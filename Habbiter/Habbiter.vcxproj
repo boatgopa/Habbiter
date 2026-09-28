@@ -118,6 +118,7 @@
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
+      <AdditionalManifestFiles>Habbiter.manifest</AdditionalManifestFiles>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -136,9 +137,12 @@
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
+      <AdditionalManifestFiles>Habbiter.manifest</AdditionalManifestFiles>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CalendarManager.h" />
+    <ClInclude Include="EH.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Habbiter.h" />
@@ -167,6 +171,9 @@
   <ItemGroup>
     <None Include="Habits.csv" />
     <None Include="Records.csv" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Habbiter.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

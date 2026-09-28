@@ -48,6 +48,12 @@
     <ClInclude Include="FileManager.h">
       <Filter>소스 파일\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="CalendarManager.h">
+      <Filter>소스 파일\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="EH.h">
+      <Filter>소스 파일\EH</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileManager.cpp">
@@ -89,7 +95,10 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Records.csv" />
     <None Include="Habits.csv" />
+    <None Include="Records.csv" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Habbiter.manifest" />
   </ItemGroup>
 </Project>

@@ -37,7 +37,6 @@ vector<Habit> FileManager::LoadHabits()
 	if (!file.is_open())
 	{
 		return habits;
-		// TODO : 파일 열기 실패 처리 로직 추가, 메시지 출력은 하는데 파일 생성은 굳이?
 	}
 
 	string line;
@@ -180,7 +179,6 @@ DailyRecord FileManager::LoadRecord(const string& date)
 
 	if (!file.is_open()) {
 		return record;
-		//TODO: 오류 메시지 출력, 파일 생성은 굳이?
 	}
 
 	string line;
@@ -228,7 +226,7 @@ DailyRecord FileManager::LoadRecord(const string& date)
 
 	return record;
 }
-
+// 기록 불러오기
 vector<DailyRecord> FileManager::LoadAllRecords()
 {
 	vector<DailyRecord> records;
@@ -238,7 +236,6 @@ vector<DailyRecord> FileManager::LoadAllRecords()
 	if (!file.is_open())
 	{
 		return records;
-		//TODO : 얘는 파일 생성 할수도? 일단 보류
 	}
 
 	string line;
@@ -285,7 +282,7 @@ vector<DailyRecord> FileManager::LoadAllRecords()
 	file.close();
 	return records;
 }
-
+// 금일 기록 생성
 DailyRecord FileManager::CreateTodayRecord(
 	const std::string& date,
 	const std::vector<Habit>& habits)
@@ -307,7 +304,7 @@ DailyRecord FileManager::CreateTodayRecord(
 
 	return record;
 }
-
+// 기록 있을때에
 bool FileManager::HasRecord(const std::string& date)
 {
 	ifstream file("Records.csv");

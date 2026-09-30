@@ -8,6 +8,7 @@
 using namespace std;
 using namespace chrono;
 
+// 오늘 날짜 가져오기
 std::string CalendarManager::GetToday()
 {
     auto now = system_clock::now();

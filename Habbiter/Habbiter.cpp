@@ -34,15 +34,17 @@ vector<string> currentHabitNames; // 선택된 기록 이름 변수
 vector<HWND> hHabitNames; // 습관 이름 변수
 vector<HWND> hHabitButtons; // 습관 상태 변경 버튼
 HWND hHabitListPanel; // 습관 목록 영역
-HWND hTitle;
-HFONT hTitleFont;
-HFONT hSuccessFont;
-HBRUSH hGreenBrush;
-HBRUSH hRedBrush;
-HBRUSH hBackgroundBrush;
-HBRUSH hAreaBrush;
+HWND hTitle; // 타이틀
+HFONT hTitleFont; // 타이틀 글꼴
+HFONT hSuccessFont; // 연속 달성 글꼴
+HBRUSH hGreenBrush; // 초록색 브러쉬
+HBRUSH hRedBrush; // 빨간색 브러쉬
+HBRUSH hBackgroundBrush; // 검은색 배경 브러쉬
+HBRUSH hAreaBrush; // 회색 영역 브러쉬
 
 constexpr int HABIT_ID = 2000; // 버튼 Id 상수 기본값
+
+// 좌표 상수
 constexpr int HABIT_LIST_TOP = 85;
 constexpr int HABIT_LIST_HEIGHT = 300;
 constexpr int HABIT_ROW_HEIGHT = 45;
@@ -59,6 +61,9 @@ void CreateHabitList(HWND hWnd);
 void UpdateHabitList(HWND hWnd);
 void HabitButton(HWND hWnd, int buttonId);
 
+/////
+// 테두리 함수들
+/////
 LRESULT CALLBACK HabitListPanelProc(
     HWND hWnd,
     UINT message,
@@ -96,6 +101,7 @@ LRESULT CALLBACK SelectedDatePanelProc(
 
 //둘데 없는 함수들 여기 두기
 
+// 습관 목록 UI 생성
 void CreateHabitList(HWND hWnd)
 {
     // 기존 습관 UI 제거
@@ -158,6 +164,7 @@ void CreateHabitList(HWND hWnd)
     }
 }
 
+// 습관 목록 UI 갱신
 void UpdateHabitList(HWND hWnd)
 {
     int y = 10;
@@ -209,7 +216,7 @@ void UpdateHabitList(HWND hWnd)
     }
 }
 
-// 습관 상태 버튼
+// 습관 상태 버튼 처리
 void HabitButton(HWND hWnd, int buttonId)
 {
     int selectedIndex =
@@ -378,6 +385,10 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
+
+    //
+    // 테두리 클래스들
+    //
     RegisterClassExW(&wcex);
 
     WNDCLASSEXW panelClass = {};
@@ -471,7 +482,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    {
        return FALSE;
    }
-
+   // 테두리
    hTitlePanel = CreateWindowExW(
        0,
        L"TitlePanel",
@@ -486,7 +497,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
        hInst,
        nullptr
    );
-
+   // 타이틀
    hTitle = CreateWindowExW(
        0,
        L"STATIC",
@@ -501,7 +512,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
        hInst,
        nullptr
    );
-
+   // 타이틀 글꼴
    hTitleFont = CreateFontW(
        32,
        0,
@@ -525,7 +536,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
        (WPARAM)hTitleFont,
        TRUE
    );
-
+   //테두리
    hCalendarPanel = CreateWindowExW(
        0,
        L"CalendarPanel",
@@ -570,7 +581,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
        hInstance,
        nullptr
    );
-
+   // 습관 삭제 버튼 생성
    HWND hHabitDeleteButton = CreateWindowExW(
        0,
        L"BUTTON",
@@ -582,7 +593,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
        hInstance,
        nullptr
    );
-
+   // 테두리
    hSuccessPanel = CreateWindowExW(
        0,
        L"SuccessPanel",
@@ -594,7 +605,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
        hInst,
        nullptr
    );
-
+   // 연속 달성
    hSuccess = CreateWindowExW(
        0,
        L"STATIC",
@@ -606,7 +617,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
        hInstance,
        nullptr
    );
-
+   // 글꼴
    hSuccessFont = CreateFontW(
        28,
        0,
@@ -634,7 +645,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    CalendarManager calendarManager;
    FileManager fileManager;
-
+   ////
+   // 오늘 날짜 기록이 없으면 생성, 있으면 불러오기
+   ///
    std::string today = calendarManager.GetToday();
 
    if (!fileManager.HasRecord(today))
@@ -657,6 +670,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    CreateHabitList(hWnd);
    UpdateHabitList(hWnd);
 
+   // 연속 완료 출력
    RecordManager recordManager;
 
    int straight =
@@ -678,6 +692,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
+// 문자열 변환 함수: UTF-8 → Wide ( 윈도우 api에서 사용하는 문자열 형식)
 wstring Utf8ToWide(const string& str)
 {
     if (str.empty())
@@ -736,7 +751,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         return 1;
     }
-
+	// 상태 변경 버튼 색상 변경
     case WM_CTLCOLORBTN:
     {
         HDC hdc = (HDC)wParam;
@@ -764,7 +779,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
 
-
+    // UI 생성
     case WM_CREATE:
     {
         hHabitListPanel = CreateWindowExW(
@@ -812,7 +827,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         break;
     }
-
+	// 습관 버튼 처리
     case WM_COMMAND:
     {
         int wmId = LOWORD(wParam);
@@ -873,7 +888,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 MessageBoxW(
                     hWnd,
-                    L"습관 추가는 오늘만 가능합니다.",
+                    L"습관 추가는 오늘로 이동하신 후 가능합니다.",
                     L"알림",
                     MB_OK
                 );
@@ -994,6 +1009,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             currentRecord.allCompleted = false;
 
 
+
             // Records.csv 저장
             if (!fileManager.SaveRecord(currentRecord))
             {
@@ -1021,6 +1037,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             }
 
+            RecordManager recordManager;
+
+            // 오늘 날짜라면 연속 완료 갱신
+            if (currentRecord.date ==
+                calendarManager.GetToday())
+            {
+                int straight =
+                    recordManager.Count(
+                        calendarManager.GetToday()
+                    );
+
+                std::wstring straightText =
+                    L"연속 완료: " +
+                    std::to_wstring(straight) +
+                    L"일🔥🔥🔥";
+
+                SetWindowTextW(
+                    hSuccess,
+                    straightText.c_str()
+                );
+            }
+
+
+            recordManager.AllCompleted(currentRecord);
+
+            InvalidateRect(hSelectedDatePanel, nullptr, TRUE);
+            UpdateWindow(hSelectedDatePanel);
 
             // 화면 갱신
 			CreateHabitList(hWnd);
@@ -1045,6 +1088,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         }
 
+        //case 1002 생성이랑 로직 동일
         case 1003:
         {
 
@@ -1058,7 +1102,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 MessageBoxW(
                     hWnd,
-                    L"습관 삭제는 오늘만 가능합니다.",
+                    L"습관 삭제는 오늘로 이동하신 후 가능합니다.",
                     L"알림",
                     MB_OK
                 );
@@ -1164,6 +1208,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             }
 
+            if (currentRecord.date ==
+                calendarManager.GetToday())
+            {
+                int straight =
+                    recordManager.Count(
+                        calendarManager.GetToday()
+                    );
+
+                std::wstring straightText =
+                    L"연속 완료: " +
+                    std::to_wstring(straight) +
+                    L"일🔥🔥🔥";
+
+                SetWindowTextW(
+                    hSuccess,
+                    straightText.c_str()
+                );
+            }
+
             CreateHabitList(hWnd);
             UpdateHabitList(hWnd);
 
@@ -1206,7 +1269,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         break;
     }
-
+	// 달력 선택 이벤트 처리
     case WM_NOTIFY:
     {
         LPNMHDR notification =
@@ -1283,7 +1346,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
 
             }
-
+            // 화면 전체 갱신들
 			CreateHabitList(hWnd);
             UpdateHabitList(hWnd);
 
@@ -1341,7 +1404,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return 0;
 }
-
+// 이하 코드들은 전부 UI 생성하는 함수들에 대한 윈도우 프로시저
 LRESULT CALLBACK HabitListPanelProc(
     HWND hWnd,
     UINT message,

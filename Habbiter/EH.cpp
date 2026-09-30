@@ -1,5 +1,6 @@
 #include "EH.h"
 
+//선택 오류
 void EH::ShowNoSelectionError(HWND hWnd)
 {
     MessageBoxW(
@@ -9,7 +10,7 @@ void EH::ShowNoSelectionError(HWND hWnd)
         MB_OK
     );
 }
-
+// 데이터 저장 오류
 void EH::ShowSaveError(HWND hWnd)
 {
     MessageBoxW(
@@ -19,7 +20,7 @@ void EH::ShowSaveError(HWND hWnd)
         MB_OK
     );
 }
-
+// 중복 처리 오류
 void EH::ShowDuplicateHabitError(HWND hWnd)
 {
     MessageBoxW(
@@ -30,6 +31,7 @@ void EH::ShowDuplicateHabitError(HWND hWnd)
     );
 }
 
+// 빈 입력 오류
 void EH::ShowEmptyInputError(HWND hWnd)
 {
     MessageBoxW(
@@ -40,6 +42,7 @@ void EH::ShowEmptyInputError(HWND hWnd)
     );
 }
 
+// 데이터 조회 오류
 void EH::ShowNoDataError(HWND hWnd)
 {
     MessageBoxW(
